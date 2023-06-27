@@ -4,11 +4,18 @@ const style = 'https://cdn.jsdelivr.net/npm/@nutui/nutui/dist/style.css'
 
 const mainFile = `
 <script setup lang="ts">
-import { ref } from 'vue'
-const msg = ref('Hello, NutUI!')
+import { showToast } from '@nutui/nutui'
+import { Dongdong } from '@nutui/icons-vue'
+const show = () => {
+  showToast.text('Hello, NutUI!')
+};
 </script>
 <template>
-  <nut-button> {{ msg }} </nut-button>
+  <nut-cell title="Click to show Toast" is-link @click="show">
+    <template #link>
+      <Dongdong />
+    </template>
+  </nut-cell>
 </template>
 `.trim()
 
