@@ -10,19 +10,22 @@ const setVH = () => {
 window.addEventListener('resize', setVH)
 setVH()
 
-let hash = location.hash.slice(1)
+const hash = location.hash.slice(1)
 
 const store = new NutUIStore({
-  serializedState: hash,
-  defaultVueRuntimeURL: 'https://cdn.jsdelivr.net/npm/@vue/runtime-dom/dist/runtime-dom.esm-browser.js'
-})
+  defaultVueRuntimeURL: 'https://cdn.jsdelivr.net/npm/@vue/runtime-dom/dist/runtime-dom.esm-browser.js',
+}, hash)
 
 store.setImportMap({
   imports: {
     '@nutui/nutui': 'https://cdn.jsdelivr.net/npm/@nutui/nutui/dist/nutui.js',
     '@nutui/icons-vue': 'https://cdn.jsdelivr.net/npm/@nutui/icons-vue/dist/lib/index.mjs',
+    '@nutui/touch-emulator': 'https://cdn.jsdelivr.net/npm/@nutui/touch-emulator',
+    // compatible with Functional Component style import
     '@nutui/nutui/dist/packages/toast/style': './style.js',
-    '@nutui/touch-emulator': './touchEmulator.js'
+    '@nutui/nutui/dist/packages/dialog/style': './style.js',
+    '@nutui/nutui/dist/packages/imagepreview/style': './style.js',
+    '@nutui/nutui/dist/packages/notify/style': './style.js',
   }
 })
 
@@ -41,9 +44,7 @@ watchEffect(() => {
     @keydown.ctrl.s.prevent
     @keydown.meta.s.prevent
     :store="store"
-    :showCompileOutput="true"
-    :autoResize="true"
-    :clearConsole="false"
+    :showImportMap="false"
   />
 </template>
 

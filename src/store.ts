@@ -22,6 +22,7 @@ const show = () => {
 const CONTAINER_FILE = 'Container.vue'
 const MAIN_FILE = 'App.vue'
 const INSTALL_FILE = 'install-nutui.js'
+const IMPORTMAP_FILE = 'import-map.json'
 
 const containerCode = `\
 <script setup>
@@ -62,26 +63,45 @@ export const installNutUI = () => {
   instance.appContext.app.use(NutUI)
 }
 `
+
+const utoa = (data: string) => {
+  return btoa(unescape(encodeURIComponent(data)))
+}
+
+const atou = (b64: string) => {
+  return decodeURIComponent(escape(atob(b64)))
+}
+
+// 不允许修改的文件，不通过 URL 传递
+const filterFiles = [IMPORTMAP_FILE, CONTAINER_FILE, INSTALL_FILE]
 export class NutUIStore extends ReplStore {
-  constructor(storeOptions?: StoreOptions) {
+  constructor(storeOptions?: StoreOptions, hash?: string) {
     super(storeOptions)
-    if (!this.state.files[CONTAINER_FILE]) {
-      const container = new File(CONTAINER_FILE, containerCode, true)
-      this.addFile(container)
+    if (hash) {
+      const saved = JSON.parse(atou(hash))
+      for (const filename in saved) {
+        if (!filterFiles.includes(filename)) {
+          this.addFile(new File(filename, saved[filename]))
+        }
+      }
     } else {
-      this.state.files[CONTAINER_FILE].hidden = true
-    }
-    if (!this.state.files[INSTALL_FILE]) {
-      const install = new File(INSTALL_FILE, installCode, true)
-      this.addFile(install)
-    } else {
-      this.state.files[INSTALL_FILE].hidden = true
-    }
-    if (!storeOptions?.serializedState) {
       const main = new File(MAIN_FILE, mainFile, false)
       this.addFile(main)
     }
+
+    const container = new File(CONTAINER_FILE, containerCode, true)
+    this.addFile(container)
+    const install = new File(INSTALL_FILE, installCode, true)
+    this.addFile(install)
+
     this.state.mainFile = CONTAINER_FILE
     this.setActive(MAIN_FILE)
+  }
+  serialize() {
+    const files = this.getFiles()
+    delete files[IMPORTMAP_FILE]
+    delete files[CONTAINER_FILE]
+    delete files[INSTALL_FILE]
+    return "#" + utoa(JSON.stringify(files))
   }
 }
