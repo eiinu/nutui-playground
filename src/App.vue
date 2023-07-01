@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Header from './Header.vue'
 import { Repl } from '@vue/repl'
+import CodeMirror from '@vue/repl/codemirror-editor'
 import { watchEffect } from 'vue'
 import { NutUIStore } from './store'
 
@@ -43,8 +44,10 @@ watchEffect(() => {
   <Repl
     @keydown.ctrl.s.prevent
     @keydown.meta.s.prevent
+    :editor="CodeMirror"
     :store="store"
     :showImportMap="false"
+    :showTsConfig="false"
   />
 </template>
 
